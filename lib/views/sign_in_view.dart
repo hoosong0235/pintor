@@ -4,14 +4,23 @@ import 'package:pintor/models/constant_model.dart';
 import 'package:pintor/views/sign_up_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pintor/views/main_view.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 // ignore: must_be_immutable
-class SignInView extends StatelessWidget {
+class SignInView extends StatefulWidget {
   static String route = 'sign_in_view';
-  SignInView({super.key});
+  const SignInView({super.key});
 
+  @override
+  State<SignInView> createState() => _SignInViewState();
+}
+
+class _SignInViewState extends State<SignInView> {
   String email = '';
+
   String password = '';
+
+  String error = '';
 
   FirebaseAuth firebaseAuth = FirebaseAuth.instance;
 
@@ -89,7 +98,22 @@ class SignInView extends StatelessWidget {
               isDense: true,
             ),
           ),
-          largeSizedBox,
+
+          //Text: error
+          error.isEmpty
+              ? Container()
+              : Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        error,
+                        textAlign: TextAlign.end,
+                        style: smallTextStyle.copyWith(color: Colors.red),
+                      ),
+                    ),
+                  ],
+                ),
+          error.isEmpty ? largeSizedBox : mediumSizedBox,
 
           // Button: 'Sign In'
           Row(
@@ -99,6 +123,8 @@ class SignInView extends StatelessWidget {
                   onPressed: () async {
                     EasyLoading.show(status: 'Sign In');
                     try {
+                      await firebaseAuth.signOut();
+
                       await firebaseAuth.signInWithEmailAndPassword(
                         email: email,
                         password: password,
@@ -110,6 +136,11 @@ class SignInView extends StatelessWidget {
                       // ignore: use_build_context_synchronously
                       Navigator.pushNamed(context, MainView.route);
                     } catch (e) {
+                      setState(
+                        () => error =
+                            e.toString().split(' ').sublist(1).join(' '),
+                      );
+
                       EasyLoading.dismiss();
                     }
                   },
@@ -147,7 +178,39 @@ class SignInView extends StatelessWidget {
             children: [
               Expanded(
                 child: OutlinedButton(
-                  onPressed: () {},
+                  onPressed: () async {
+                    EasyLoading.show(status: 'Sign In');
+                    try {
+                      await firebaseAuth.signOut();
+
+                      final GoogleSignInAccount? googleUser =
+                          await GoogleSignIn().signIn();
+
+                      final GoogleSignInAuthentication? googleAuth =
+                          await googleUser?.authentication;
+
+                      final credential = GoogleAuthProvider.credential(
+                        accessToken: googleAuth?.accessToken,
+                        idToken: googleAuth?.idToken,
+                      );
+
+                      await FirebaseAuth.instance
+                          .signInWithCredential(credential);
+
+                      EasyLoading.dismiss();
+                      // ignore: use_build_context_synchronously
+                      Navigator.pop(context);
+                      // ignore: use_build_context_synchronously
+                      Navigator.pushNamed(context, MainView.route);
+                    } catch (e) {
+                      setState(
+                        () => error =
+                            e.toString().split(' ').sublist(1).join(' '),
+                      );
+
+                      EasyLoading.dismiss();
+                    }
+                  },
                   child: const Text('Google'),
                 ),
               ),

@@ -4,6 +4,7 @@ import 'package:pintor/models/constant_model.dart';
 import 'package:flutter/material.dart';
 import 'package:pintor/models/theme_model.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class MainView extends StatefulWidget {
   static String route = 'chat_view';
@@ -19,6 +20,8 @@ class _MainViewState extends State<MainView> {
   String string = '';
   String url = '';
 
+  FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+
   @override
   Widget build(BuildContext context) {
     // Chat View
@@ -26,9 +29,9 @@ class _MainViewState extends State<MainView> {
       builder: (context, value, child) => Scaffold(
         // Scaffold: App Bar
         appBar: AppBar(
-          // App Bar: 'pintor'
-          title: const Text(
-            'pintor',
+          // App Bar: username
+          title: Text(
+            firebaseAuth.currentUser!.displayName.toString(),
             style: mediumTextStyle,
           ),
           actions: [

@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ChatController {
-  String key = 'Bearer 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';
+  String key = 'Bearer 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';
   String authority = 'api.openai.com';
   String error =
       'https://e7.pngegg.com/pngimages/10/205/png-clipart-computer-icons-error-information-error-angle-triangle.png';

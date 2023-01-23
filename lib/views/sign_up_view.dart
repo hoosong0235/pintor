@@ -1,18 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:pintor/models/constant_model.dart';
 import 'package:pintor/views/main_view.dart';
 import 'package:pintor/views/sign_in_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 // ignore: must_be_immutable
-class SignUpView extends StatelessWidget {
+class SignUpView extends StatefulWidget {
   static String route = 'sign_up_view';
-  SignUpView({super.key});
+  const SignUpView({super.key});
 
+  @override
+  State<SignUpView> createState() => _SignUpViewState();
+}
+
+class _SignUpViewState extends State<SignUpView> {
   String name = '';
+
   String email = '';
+
   String password = '';
+
+  String error = '';
 
   FirebaseAuth firebaseAuth = FirebaseAuth.instance;
 
@@ -105,7 +115,22 @@ class SignUpView extends StatelessWidget {
               isDense: true,
             ),
           ),
-          largeSizedBox,
+
+          //Text: error
+          error.isEmpty
+              ? Container()
+              : Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        error,
+                        textAlign: TextAlign.end,
+                        style: smallTextStyle.copyWith(color: Colors.red),
+                      ),
+                    ),
+                  ],
+                ),
+          error.isEmpty ? largeSizedBox : mediumSizedBox,
 
           // Button: 'Sign Up'
           Row(
@@ -115,10 +140,14 @@ class SignUpView extends StatelessWidget {
                   onPressed: () async {
                     EasyLoading.show(status: 'Sign Up');
                     try {
+                      await firebaseAuth.signOut();
+
                       await firebaseAuth.createUserWithEmailAndPassword(
                         email: email,
                         password: password,
                       );
+
+                      await firebaseAuth.currentUser?.updateDisplayName(name);
 
                       EasyLoading.dismiss();
                       // ignore: use_build_context_synchronously
@@ -126,6 +155,11 @@ class SignUpView extends StatelessWidget {
                       // ignore: use_build_context_synchronously
                       Navigator.pushNamed(context, MainView.route);
                     } catch (e) {
+                      setState(
+                        () => error =
+                            e.toString().split(' ').sublist(1).join(' '),
+                      );
+
                       EasyLoading.dismiss();
                     }
                   },
@@ -163,7 +197,39 @@ class SignUpView extends StatelessWidget {
             children: [
               Expanded(
                 child: OutlinedButton(
-                  onPressed: () {},
+                  onPressed: () async {
+                    EasyLoading.show(status: 'Sign Up');
+                    try {
+                      await firebaseAuth.signOut();
+
+                      final GoogleSignInAccount? googleUser =
+                          await GoogleSignIn().signIn();
+
+                      final GoogleSignInAuthentication? googleAuth =
+                          await googleUser?.authentication;
+
+                      final credential = GoogleAuthProvider.credential(
+                        accessToken: googleAuth?.accessToken,
+                        idToken: googleAuth?.idToken,
+                      );
+
+                      await FirebaseAuth.instance
+                          .signInWithCredential(credential);
+
+                      EasyLoading.dismiss();
+                      // ignore: use_build_context_synchronously
+                      Navigator.pop(context);
+                      // ignore: use_build_context_synchronously
+                      Navigator.pushNamed(context, MainView.route);
+                    } catch (e) {
+                      setState(
+                        () => error =
+                            e.toString().split(' ').sublist(1).join(' '),
+                      );
+
+                      EasyLoading.dismiss();
+                    }
+                  },
                   child: const Text('Google'),
                 ),
               ),

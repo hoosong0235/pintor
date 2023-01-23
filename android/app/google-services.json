@@ -14,7 +14,15 @@
       },
       "oauth_client": [
         {
-          "client_id": "627652590561-kau3jq447j3oi70ohgrs5k0vs2ph2lf7.apps.googleusercontent.com",
+          "client_id": "627652590561-kt50esdad7m56ejpj6lj4rv71hf7fpg4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.develop0235.pintor",
+            "certificate_hash": "7092fd642fc989ab75a83aac3d800149c22db3e7"
+          }
+        },
+        {
+          "client_id": "627652590561-ep4nudknq07h9pnv1uded01k558uhtsg.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
@@ -27,7 +35,7 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "627652590561-kau3jq447j3oi70ohgrs5k0vs2ph2lf7.apps.googleusercontent.com",
+              "client_id": "627652590561-ep4nudknq07h9pnv1uded01k558uhtsg.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
